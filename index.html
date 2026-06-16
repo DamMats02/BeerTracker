@@ -3,199 +3,434 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>index.html</title>
+    <title>Greek Craft Beer Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #0284c7;
-            --primary-dark: #0369a1;
-            --bg: #0f172a;
-            --surface: #1e293b;
-            --surface-card: #111827;
-            --text: #f8fafc;
-            --text-muted: #94a3b8;
-            --border: #334155;
-            --success: #10b981;
+            --amber:       #C87533;
+            --amber-light: #E8A050;
+            --amber-dark:  #8B4E1A;
+            --copper:      #B06020;
+            --foam:        #F5ECD7;
+            --foam-dim:    #E8D8B8;
+            --parchment:   #2A1F14;
+            --ink:         #1A1208;
+            --slate:       #3D2E1E;
+            --slate-mid:   #4A3828;
+            --malt:        #5C4030;
+            --text-warm:   #F0E0C0;
+            --text-mid:    #B89870;
+            --text-dim:    #7A6040;
+            --border:      #4A3828;
+            --success:     #5B8A4A;
+            --hop-green:   #6B8A3A;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            background-color: var(--bg);
-            color: var(--text);
-            padding: 20px;
+            background-color: var(--ink);
+            background-image:
+                radial-gradient(ellipse 80% 40% at 50% 0%, rgba(200,117,51,0.12) 0%, transparent 60%),
+                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C87533' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            color: var(--text-warm);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            padding: 0 0 60px 0;
         }
 
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-
+        /* ── HEADER ── */
         header {
+            position: relative;
             text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid var(--border);
+            padding: 52px 24px 40px;
+            border-bottom: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 320px; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--amber), transparent);
+        }
+
+        .header-eyebrow {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--amber);
+            margin-bottom: 14px;
+            opacity: 0.9;
         }
 
         header h1 {
-            color: var(--primary);
-            font-size: 2.5rem;
-            margin-bottom: 5px;
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.2rem, 5vw, 3.6rem);
+            font-weight: 900;
+            line-height: 1.05;
+            color: var(--foam);
+            margin-bottom: 4px;
         }
 
-        header p {
-            color: var(--text-muted);
+        header h1 em {
+            font-style: italic;
+            color: var(--amber-light);
+        }
+
+        .header-sub {
+            font-size: 0.85rem;
+            color: var(--text-mid);
+            margin-top: 10px;
+            font-weight: 300;
+            letter-spacing: 0.02em;
+        }
+
+        /* Decorative hops SVG */
+        .hop-deco {
+            position: absolute;
+            top: 20px; right: 30px;
+            opacity: 0.18;
+            transform: rotate(15deg);
+        }
+        .hop-deco-left {
+            position: absolute;
+            top: 20px; left: 30px;
+            opacity: 0.18;
+            transform: rotate(-15deg) scaleX(-1);
+        }
+
+        /* ── LAYOUT ── */
+        .container {
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 32px 20px 0;
         }
 
         .grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 20px;
+            gap: 24px;
         }
 
-        @media (min-width: 768px) {
-            .grid {
-                grid-template-columns: 1fr 1.5fr;
-            }
+        @media (min-width: 820px) {
+            .grid { grid-template-columns: 340px 1fr; }
         }
 
+        /* ── CARDS ── */
         .card {
-            background: var(--surface);
+            background: var(--parchment);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 20px;
-            height: fit-content;
+            border-radius: 4px;
+            padding: 24px;
             margin-bottom: 20px;
+            position: relative;
         }
 
-        h2 {
-            margin-bottom: 15px;
-            font-size: 1.2rem;
-            border-left: 4px solid var(--primary);
-            padding-left: 10px;
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            right: 0; height: 2px;
+            background: linear-gradient(90deg, var(--amber-dark), var(--amber-light), var(--amber-dark));
+            border-radius: 4px 4px 0 0;
+            opacity: 0.7;
         }
 
-        .form-group {
-            margin-bottom: 12px;
+        .card h2 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.68rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--amber);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
+
+        .card h2::before {
+            content: '';
+            display: block;
+            width: 16px; height: 1px;
+            background: var(--amber);
+            opacity: 0.6;
+        }
+
+        /* ── FORM ELEMENTS ── */
+        .form-group { margin-bottom: 14px; }
 
         label {
             display: block;
-            margin-bottom: 5px;
-            font-size: 0.85rem;
-            color: var(--text-muted);
+            font-size: 0.72rem;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-mid);
+            margin-bottom: 6px;
         }
 
         input, select, textarea {
             width: 100%;
-            padding: 10px;
-            background: var(--bg);
+            padding: 10px 12px;
+            background: var(--ink);
             border: 1px solid var(--border);
-            color: var(--text);
-            border-radius: 4px;
-            font-size: 0.95rem;
+            border-bottom-color: var(--malt);
+            color: var(--text-warm);
+            border-radius: 3px;
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.15s;
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: var(--text-dim);
+            font-style: italic;
         }
 
         input:focus, select:focus, textarea:focus {
             outline: none;
-            border-color: var(--primary);
+            border-color: var(--amber);
+            box-shadow: 0 0 0 2px rgba(200,117,51,0.15);
         }
 
-        button {
+        select option { background: var(--ink); }
+
+        .row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        /* ── BUTTONS ── */
+        .btn {
             width: 100%;
-            padding: 12px;
-            background: var(--primary);
-            color: white;
+            padding: 12px 20px;
             border: none;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 1rem;
+            border-radius: 3px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.18s;
+            font-family: 'Inter', sans-serif;
         }
 
-        button:hover {
-            background: var(--primary-dark);
+        .btn-primary {
+            background: linear-gradient(135deg, var(--amber-dark), var(--copper));
+            color: var(--foam);
+            border: 1px solid var(--amber);
+            box-shadow: 0 2px 8px rgba(200,117,51,0.25);
         }
 
-        .status-badge {
-            font-size: 0.8rem;
-            padding: 4px 8px;
-            border-radius: 12px;
-            display: inline-block;
-            margin-top: 5px;
-            background: #334155;
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--copper), var(--amber));
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(200,117,51,0.35);
         }
 
-        .status-connected { background: #065f46; color: #34d399; }
-
-        .beer-card {
-            background: var(--surface-card);
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-mid);
             border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 15px;
-            margin-bottom: 15px;
         }
 
-        .beer-header {
+        .btn-secondary:hover {
+            border-color: var(--amber-dark);
+            color: var(--text-warm);
+        }
+
+        /* ── STATUS ── */
+        #connStatus {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.73rem;
+            font-family: 'JetBrains Mono', monospace;
+            padding: 5px 10px;
+            border-radius: 2px;
+            margin-top: 10px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+        }
+
+        #connStatus.status-connected {
+            background: rgba(91,138,74,0.12);
+            border-color: var(--success);
+            color: #7FBF5A;
+        }
+
+        #connStatus::before {
+            content: '●';
+            font-size: 0.55rem;
+        }
+
+        /* ── FEED ── */
+        .feed-header {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .feed-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            color: var(--foam);
+        }
+
+        .feed-count {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+        }
+
+        /* ── BEER CARD ── */
+        .beer-card {
+            position: relative;
+            background: var(--slate);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--amber-dark);
+            border-radius: 3px;
+            padding: 18px 18px 14px;
+            margin-bottom: 14px;
+            transition: border-left-color 0.15s, transform 0.15s;
+        }
+
+        .beer-card:hover {
+            border-left-color: var(--amber-light);
+            transform: translateX(2px);
+        }
+
+        .beer-top {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
+            margin-bottom: 4px;
+            gap: 12px;
         }
 
         .beer-name {
-            font-weight: bold;
-            font-size: 1.2rem;
-            color: #e2e8f0;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--foam);
+            line-height: 1.2;
         }
 
-        .brewery-name {
-            font-size: 0.9rem;
-            color: var(--primary);
-            margin-bottom: 10px;
+        .beer-rating {
+            font-size: 0.8rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .brewery-line {
+            font-size: 0.8rem;
+            color: var(--amber-light);
             font-weight: 500;
-        }
-
-        .beer-meta {
-            display: flex;
-            gap: 15px;
-            font-size: 0.85rem;
-            background: var(--surface);
-            padding: 5px 10px;
-            border-radius: 4px;
-            width: fit-content;
             margin-bottom: 10px;
-            border: 1px solid var(--border);
         }
 
-        .rating { color: #fbbf24; font-weight: bold; }
-        .sync-indicator {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-align: right;
-            margin-top: 5px;
+        .brewery-line .sep { color: var(--text-dim); margin: 0 4px; }
+
+        .beer-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 10px;
         }
+
+        .chip {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.68rem;
+            padding: 3px 8px;
+            background: rgba(200,117,51,0.12);
+            border: 1px solid rgba(200,117,51,0.25);
+            border-radius: 2px;
+            color: var(--text-mid);
+            letter-spacing: 0.04em;
+        }
+
+        .chip.abv { color: var(--amber-light); border-color: rgba(200,117,51,0.4); }
+
+        .beer-notes {
+            font-size: 0.83rem;
+            color: var(--text-mid);
+            line-height: 1.55;
+            font-style: italic;
+            border-top: 1px solid var(--border);
+            padding-top: 10px;
+            margin-top: 4px;
+        }
+
+        .sync-tag {
+            display: inline-block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.62rem;
+            color: var(--text-dim);
+            margin-top: 8px;
+            letter-spacing: 0.05em;
+        }
+
+        /* ── DIVIDER ── */
+        .ornament {
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.75rem;
+            letter-spacing: 0.3em;
+            margin: 8px 0 16px;
+            opacity: 0.5;
+        }
+
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header>
-        <h1>🇬🇷 Greek Craft Beer Tracker</h1>
-        <p>Log beers into your decentralized GitHub database repository</p>
-    </header>
+<!-- Header -->
+<header>
+    <svg class="hop-deco" width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="45" cy="18" rx="12" ry="16" fill="#C87533"/>
+        <ellipse cx="45" cy="18" rx="8" ry="11" fill="#8B4E1A"/>
+        <line x1="45" y1="34" x2="45" y2="75" stroke="#6B8A3A" stroke-width="2.5"/>
+        <ellipse cx="32" cy="46" rx="11" ry="14" fill="#C87533" transform="rotate(-15 32 46)"/>
+        <ellipse cx="32" cy="46" rx="7" ry="10" fill="#8B4E1A" transform="rotate(-15 32 46)"/>
+        <ellipse cx="58" cy="52" rx="11" ry="14" fill="#C87533" transform="rotate(15 58 52)"/>
+        <ellipse cx="58" cy="52" rx="7" ry="10" fill="#8B4E1A" transform="rotate(15 58 52)"/>
+        <ellipse cx="36" cy="65" rx="10" ry="13" fill="#C87533" transform="rotate(-10 36 65)"/>
+        <ellipse cx="36" cy="65" rx="6.5" ry="9" fill="#8B4E1A" transform="rotate(-10 36 65)"/>
+        <ellipse cx="56" cy="70" rx="10" ry="12" fill="#C87533" transform="rotate(8 56 70)"/>
+        <ellipse cx="56" cy="70" rx="6.5" ry="8" fill="#8B4E1A" transform="rotate(8 56 70)"/>
+    </svg>
+    <svg class="hop-deco-left" width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="45" cy="18" rx="12" ry="16" fill="#C87533"/>
+        <ellipse cx="45" cy="18" rx="8" ry="11" fill="#8B4E1A"/>
+        <line x1="45" y1="34" x2="45" y2="75" stroke="#6B8A3A" stroke-width="2.5"/>
+        <ellipse cx="32" cy="46" rx="11" ry="14" fill="#C87533" transform="rotate(-15 32 46)"/>
+        <ellipse cx="58" cy="52" rx="11" ry="14" fill="#C87533" transform="rotate(15 58 52)"/>
+        <ellipse cx="36" cy="65" rx="10" ry="13" fill="#C87533" transform="rotate(-10 36 65)"/>
+        <ellipse cx="56" cy="70" rx="10" ry="12" fill="#C87533" transform="rotate(8 56 70)"/>
+    </svg>
 
+    <div class="header-eyebrow">Hellenic Craft Beer Journal</div>
+    <h1>Greek <em>Craft</em> Beer Tracker</h1>
+    <p class="header-sub">Log & sync your discoveries to a decentralized GitHub repository</p>
+</header>
+
+<div class="container">
     <div class="grid">
-        <!-- LEFT COLUMN: CONFIG & FORM -->
+
+        <!-- LEFT COLUMN -->
         <div>
-            <!-- GitHub Settings -->
+            <!-- GitHub Config -->
             <div class="card">
-                <h2>1. GitHub Database Config</h2>
+                <h2>GitHub Database</h2>
                 <div class="form-group">
                     <label for="ghToken">Personal Access Token (PAT)</label>
                     <input type="password" id="ghToken" placeholder="github_pat_...">
@@ -205,16 +440,17 @@
                     <input type="text" id="ghRepo" placeholder="username/repo-name">
                 </div>
                 <div class="form-group">
-                    <label for="ghPath">File Path in Repo</label>
+                    <label for="ghPath">File Path</label>
                     <input type="text" id="ghPath" value="beers.json">
                 </div>
-                <button id="testConnectionBtn" style="background:#475569;">Connect & Sync Repo</button>
-                <div id="connStatus" class="status-badge">Not Configured (Using Local Fallback)</div>
+                <button class="btn btn-secondary" id="testConnectionBtn">Connect & Sync</button>
+                <br>
+                <div id="connStatus">Not Configured — Local Mode</div>
             </div>
 
             <!-- Form -->
             <div class="card">
-                <h2>2. Log a New Greek Beer</h2>
+                <h2>Log a New Beer</h2>
                 <form id="beerForm">
                     <div class="form-group">
                         <label for="beerName">Beer Name</label>
@@ -228,41 +464,47 @@
                         <label for="region">Region of Greece</label>
                         <input type="text" id="region" required placeholder="e.g., Athens, Attica">
                     </div>
-                    <div class="form-group">
-                        <label for="beerStyle">Style</label>
-                        <input type="text" id="beerStyle" required placeholder="e.g., New England IPA">
+                    <div class="row-2">
+                        <div class="form-group">
+                            <label for="beerStyle">Style</label>
+                            <input type="text" id="beerStyle" required placeholder="e.g., Hazy IPA">
+                        </div>
+                        <div class="form-group">
+                            <label for="beerAbv">ABV (%)</label>
+                            <input type="number" id="beerAbv" step="0.1" placeholder="6.2">
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label for="beerAbv">ABV (%)</label>
-                        <input type="number" id="beerAbv" step="0.1" placeholder="e.g., 6.2">
-                    </div>
-                    <div class="form-group">
-                        <label for="beerRating">Your Rating</label>
+                        <label for="beerRating">Rating</label>
                         <select id="beerRating">
-                            <option value="⭐⭐⭐⭐⭐">⭐⭐⭐⭐⭐</option>
-                            <option value="⭐⭐⭐⭐">⭐⭐⭐⭐</option>
-                            <option value="⭐⭐⭐">⭐⭐⭐</option>
+                            <option value="⭐⭐⭐⭐⭐">⭐⭐⭐⭐⭐ — Outstanding</option>
+                            <option value="⭐⭐⭐⭐">⭐⭐⭐⭐ — Very Good</option>
+                            <option value="⭐⭐⭐">⭐⭐⭐ — Good</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="beerNotes">Tasting Notes</label>
-                        <textarea id="beerNotes" rows="2" placeholder="Where did you drink it? Flavors?"></textarea>
+                        <textarea id="beerNotes" rows="3" placeholder="Where did you drink it? Aromas, flavors, finish…"></textarea>
                     </div>
-                    <button type="submit">Commit to Database</button>
+                    <button type="submit" class="btn btn-primary">Commit to Database</button>
                 </form>
             </div>
         </div>
 
-        <!-- RIGHT COLUMN: BEER FEED -->
-        <div class="card">
-            <h2>Greek Beer Feed</h2>
+        <!-- RIGHT COLUMN: FEED -->
+        <div class="card" style="margin-bottom:0;">
+            <div class="feed-header">
+                <span class="feed-title">The Cellar</span>
+                <span class="feed-count" id="feedCount">— beers logged</span>
+            </div>
+            <div class="ornament">⸻ ✦ ⸻</div>
             <div id="beerFeed"></div>
         </div>
+
     </div>
 </div>
 
 <script>
-    // Initial Seed Data: Famous Craft Beers Throughout Greece
     const greekSeedBeers = [
         { id: 1, name: "Jasmine", brewery: "Strange Brew", region: "Athens, Attica", style: "Hazy IPA", abv: "6.2", rating: "⭐⭐⭐⭐⭐", notes: "Explosive citrus and tropical fruit aromas. Arguably one of Greece's most famous modern craft IPAs." },
         { id: 2, name: "8th Day (8η Μέρα)", brewery: "Septem Microbrewery", region: "Orologio, Evia", style: "India Pale Ale", abv: "7.0", rating: "⭐⭐⭐⭐⭐", notes: "Award-winning IPA from Evia. Creamy head, aromatic pine, and rich caramel malts with an intense bitter finish." },
@@ -273,49 +515,52 @@
     ];
 
     let currentBeers = [...greekSeedBeers];
-    let currentSha = null; // Stored to make writing updates to GitHub possible
+    let currentSha = null;
 
     const beerForm = document.getElementById('beerForm');
     const beerFeed = document.getElementById('beerFeed');
     const connStatus = document.getElementById('connStatus');
+    const feedCount = document.getElementById('feedCount');
 
-    // Render logic
     function renderFeed() {
         beerFeed.innerHTML = '';
+        feedCount.textContent = `${currentBeers.length} beer${currentBeers.length !== 1 ? 's' : ''} logged`;
         [...currentBeers].reverse().forEach(beer => {
             const card = document.createElement('div');
             card.className = 'beer-card';
+            const isSeed = beer.id < 10;
             card.innerHTML = `
-                <div class="beer-header">
+                <div class="beer-top">
                     <div class="beer-name">${escapeHTML(beer.name)}</div>
-                    <div class="rating">${beer.rating}</div>
+                    <div class="beer-rating">${beer.rating}</div>
                 </div>
-                <div class="brewery-name">📍 ${escapeHTML(beer.brewery)} (${escapeHTML(beer.region)})</div>
-                <div class="beer-meta">
-                    <span><strong>Style:</strong> ${escapeHTML(beer.style)}</span>
-                    <span>•</span>
-                    <span><strong>ABV:</strong> ${beer.abv ? beer.abv + '%' : 'N/A'}</span>
+                <div class="brewery-line">
+                    ${escapeHTML(beer.brewery)}<span class="sep">·</span>${escapeHTML(beer.region)}
                 </div>
-                <p style="font-size:0.9rem; color:#cbd5e1;">${escapeHTML(beer.notes || 'No tasting notes recorded.')}</p>
-                <div class="sync-indicator">${beer.id < 10 ? '📦 System Seed Beer' : '💾 Database Synced Record'}</div>
+                <div class="beer-chips">
+                    <span class="chip">${escapeHTML(beer.style)}</span>
+                    ${beer.abv ? `<span class="chip abv">${beer.abv}% ABV</span>` : ''}
+                </div>
+                ${beer.notes ? `<div class="beer-notes">"${escapeHTML(beer.notes)}"</div>` : ''}
+                <span class="sync-tag">${isSeed ? '⬡ seed record' : '⬢ synced entry'}</span>
             `;
             beerFeed.appendChild(card);
         });
     }
 
     function escapeHTML(str) {
-        return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+        if (!str) return '';
+        return String(str).replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
     }
 
-    // GitHub Integration Engine
     async function syncWithGitHub(action = 'fetch', newBeerObj = null) {
         const token = document.getElementById('ghToken').value.trim();
         const repo = document.getElementById('ghRepo').value.trim();
         const path = document.getElementById('ghPath').value.trim();
 
         if (!token || !repo) {
-            if(action === 'save') {
-                alert("GitHub credentials missing! Saving locally to runtime instead.");
+            if (action === 'save') {
+                alert("GitHub credentials missing! Saving to local runtime instead.");
                 currentBeers.push(newBeerObj);
                 renderFeed();
             }
@@ -330,20 +575,18 @@
         };
 
         try {
-            // Step 1: Always check the latest file state to grab the up-to-date commit SHA identifier
             const getResponse = await fetch(url, { headers });
-            
+
             if (getResponse.status === 200) {
                 const data = await getResponse.json();
                 currentSha = data.sha;
                 const decodedContent = JSON.parse(atob(data.content));
-                
-                // Merge loaded data over the runtime baseline array
+
                 if (Array.isArray(decodedContent)) {
                     if (action === 'fetch') {
                         currentBeers = [...greekSeedBeers, ...decodedContent];
-                        connStatus.className = "status-badge status-connected";
-                        connStatus.innerText = "Connected to GitHub Data File";
+                        connStatus.className = "status-connected";
+                        connStatus.innerText = "Connected — GitHub sync active";
                     } else if (action === 'save' && newBeerObj) {
                         decodedContent.push(newBeerObj);
                         currentBeers = [...greekSeedBeers, ...decodedContent];
@@ -351,25 +594,24 @@
                     }
                 }
             } else if (getResponse.status === 404 && action === 'save' && newBeerObj) {
-                // Handle non-existent configuration files cleanly
                 const newArray = [newBeerObj];
                 currentBeers.push(newBeerObj);
                 await pushToGitHub(url, headers, newArray);
             } else {
-                throw new Error("Unable to read data file structural integrity.");
+                throw new Error("Unable to read data file.");
             }
             renderFeed();
         } catch (err) {
             console.error(err);
-            connStatus.className = "status-badge";
-            connStatus.innerText = "Error syncing with GitHub";
-            alert("GitHub API Synchronization Error: Check repo naming constraints, path values, or permissions scopes.");
+            connStatus.className = "";
+            connStatus.innerText = "Sync error — check credentials";
+            alert("GitHub sync failed. Check your repo path, token, and permissions.");
         }
     }
 
     async function pushToGitHub(url, headers, dataArray) {
         const body = {
-            message: "Database Sync: Logged a new regional craft beer",
+            message: "Beer log: added new craft entry",
             content: btoa(JSON.stringify(dataArray, null, 2)),
         };
         if (currentSha) body.sha = currentSha;
@@ -382,16 +624,15 @@
 
         if (putResponse.ok) {
             const putResData = await putResponse.json();
-            currentSha = putResData.content.sha; // Update running file index SHA reference identifier
-            alert("Successfully saved and committed change history to GitHub Repository!");
+            currentSha = putResData.content.sha;
+            alert("Saved and committed to GitHub!");
         } else {
-            throw new Error("Commit transaction rejected by remote host infrastructure.");
+            throw new Error("Commit rejected by GitHub.");
         }
     }
 
-    // Listeners
     document.getElementById('testConnectionBtn').addEventListener('click', () => syncWithGitHub('fetch'));
-    
+
     beerForm.addEventListener('submit', function(e) {
         e.preventDefault();
         const newBeer = {
@@ -404,12 +645,10 @@
             rating: document.getElementById('beerRating').value,
             notes: document.getElementById('beerNotes').value.trim()
         };
-
         syncWithGitHub('save', newBeer);
         beerForm.reset();
     });
 
-    // Run baseline feed on startup
     renderFeed();
 </script>
 </body>
