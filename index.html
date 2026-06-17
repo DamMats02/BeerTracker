@@ -553,13 +553,21 @@
         return String(str).replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
     }
 
+    // Custom helper functions to handle UTF-8 / Non-Latin strings in Base64
+    function utoa(str) {
+        return btoa(unescape(encodeURIComponent(str)));
+    }
+    function atou(str) {
+        return decodeURIComponent(escape(atob(str)));
+    }
+
     async function syncWithGitHub(action = 'fetch', newBeerObj = null) {
         const token = document.getElementById('ghToken').value.trim();
         const repo = document.getElementById('ghRepo').value.trim();
         const path = document.getElementById('ghPath').value.trim();
 
         if (!token || !repo) {
-            if (action === 'save') {
+            if (action === 'save' && newBeerObj) {
                 alert("GitHub credentials missing! Saving to local runtime instead.");
                 currentBeers.push(newBeerObj);
                 renderFeed();
@@ -568,8 +576,9 @@
         }
 
         const url = `https://api.github.com/repos/${repo}/contents/${path}`;
+        // Using 'Bearer' header syntax is safer for modern Fine-Grained GitHub PATs
         const headers = {
-            "Authorization": `token ${token}`,
+            "Authorization": `Bearer ${token}`,
             "Accept": "application/vnd.github.v3+json",
             "Content-Type": "application/json"
         };
@@ -580,7 +589,8 @@
             if (getResponse.status === 200) {
                 const data = await getResponse.json();
                 currentSha = data.sha;
-                const decodedContent = JSON.parse(atob(data.content));
+                // Use UTF-8 safe Decoder
+                const decodedContent = JSON.parse(atou(data.content));
 
                 if (Array.isArray(decodedContent)) {
                     if (action === 'fetch') {
@@ -594,25 +604,27 @@
                     }
                 }
             } else if (getResponse.status === 404 && action === 'save' && newBeerObj) {
+                // If file doesn't exist, start a fresh remote array
                 const newArray = [newBeerObj];
                 currentBeers.push(newBeerObj);
                 await pushToGitHub(url, headers, newArray);
             } else {
-                throw new Error("Unable to read data file.");
+                throw new Error(`Unable to read data file. Status: ${getResponse.status}`);
             }
             renderFeed();
         } catch (err) {
             console.error(err);
             connStatus.className = "";
             connStatus.innerText = "Sync error — check credentials";
-            alert("GitHub sync failed. Check your repo path, token, and permissions.");
+            alert("GitHub sync failed. Check your repo path, token, and permissions. Look at the browser console for details.");
         }
     }
 
     async function pushToGitHub(url, headers, dataArray) {
         const body = {
             message: "Beer log: added new craft entry",
-            content: btoa(JSON.stringify(dataArray, null, 2)),
+            // Use UTF-8 safe Encoder
+            content: utoa(JSON.stringify(dataArray, null, 2)),
         };
         if (currentSha) body.sha = currentSha;
 
@@ -624,9 +636,13 @@
 
         if (putResponse.ok) {
             const putResData = await putResponse.json();
-            currentSha = putResData.content.sha;
+            currentSha = putResData.content.sha; // Capture updated SHA for subsequent saves
+            connStatus.className = "status-connected";
+            connStatus.innerText = "Connected — GitHub sync active";
             alert("Saved and committed to GitHub!");
         } else {
+            const errorText = await putResponse.text();
+            console.error("GitHub PUT failed:", errorText);
             throw new Error("Commit rejected by GitHub.");
         }
     }
